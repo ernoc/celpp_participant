@@ -103,3 +103,6 @@ miniconda2
 
 # Pycharm
 .idea
+
+# project-specific
+adv_celppade_env.sh
