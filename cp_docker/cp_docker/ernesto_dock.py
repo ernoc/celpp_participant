@@ -4,7 +4,7 @@ from subprocess import check_call
 
 from d3r.celppade.custom_dock import Dock
 
-from config import JMOL_JAR
+from config import JMOL_JAR, OPENBABEL_CMD
 
 __author__ = 'ocampoernesto@gmail.com'
 
@@ -102,6 +102,9 @@ class MyDocker(Dock):
                     'load {mol2_in}; write {out_file}'.format(
                         mol2_in=temp_mol2_path,
                         out_file=output_lig_mol)])
+
+        # pass through openbabel to remove charges:
+        check_call([OPENBABEL_CMD, output_lig_mol, '-O{}'.format(output_lig_mol)])
         os.remove(temp_mol2_path)
 
         # copy receptor to receptor output path - we don't do any changes to receptors:
