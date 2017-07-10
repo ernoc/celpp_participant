@@ -13,9 +13,10 @@ class ProteinPreparation(ProteinPrep):
     for CELPP
     """
     ProteinPrep.OUTPUT_PROTEIN_SUFFIX = '.pdb'
-    def receptor_scientific_prep(self, 
-                                 protein_file, 
-                                 prepared_protein_file, 
+
+    def receptor_scientific_prep(self,
+                                 protein_file,
+                                 prepared_protein_file,
                                  targ_info_dict={}):
         """
         Protein 'scientific preparation' is the process of generating
@@ -26,19 +27,26 @@ class ProteinPreparation(ProteinPrep):
         :param targ_info_dict: A dictionary of information about this target and the candidates chosen for docking.  
         :returns: True if preparation was successful. False otherwise.
         """
-        check_call(['java', '-jar', JMOL_JAR, '--exit', '-i', '-p', '-J',
-                    'load {pdb_in}; select protein; write {pdb_out}'.format(
-                        pdb_in=protein_file,
-                        pdb_out=prepared_protein_file)
-                    ])
+        # code taken and adapted from ProteinPrep
+        # Poor man's receptor splitting - Remove all HETATM and CONECT lines
+        with open(protein_file) as in_file:
+            data = in_file.readlines()
+        with open(prepared_protein_file, 'wb') as of:
+            for line in data:
+                if (line[:6] == 'HETATM') or (line[:6] == 'CONECT'):
+                    continue
+                else:
+                    of.write(line)
+
         return True
-    
+
 
 if "__main__" == __name__:
     import logging
     import os
     import shutil
     from argparse import ArgumentParser
+
     parser = ArgumentParser()
     parser.add_argument("-p", "--pdbdb", metavar="PATH", help="PDB DATABANK which we will dock into")
     parser.add_argument("-c", "--challengedata", metavar="PATH", help="PATH to the unpacked challenge data package")
